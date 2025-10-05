@@ -7,7 +7,9 @@ import * as config from "./config";
 
 const app = new BoltJS.App({
     signingSecret: process.env.SIGNING_SECRET,
-    token: process.env.APP_TOKEN
+    token: process.env.BOT_TOKEN,
+    appToken: process.env.APP_TOKEN,
+    socketMode: process.env.NODE_ENV === "development"
 });
 
 if (config.interactionImports.actions) {
