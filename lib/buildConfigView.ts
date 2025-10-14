@@ -5,6 +5,7 @@ export default function buildConfigView(config: AnchorChannelConfig): ModalView 
     return {
         "type": "modal",
         "callback_id": "config_view_submit",
+        "private_metadata": config.channel_id,
         "title": {
             "type": "plain_text",
             "text": "Anchor Configuration",
@@ -45,7 +46,7 @@ export default function buildConfigView(config: AnchorChannelConfig): ModalView 
                         "emoji": true
                     },
                     "style": config.enabled ? 'danger': 'primary',
-                    "value": config.channel_id,
+                    "value": config.enabled.toString(),
                     "action_id": "toggle-anchor-status"
                 }
             },
@@ -54,7 +55,7 @@ export default function buildConfigView(config: AnchorChannelConfig): ModalView 
                 "block_id": "rich_text",
                 "element": {
                     "type": "rich_text_input",
-                    "action_id": "rich_text_input-action",
+                    "action_id": "rich_text",
                     "initial_value": config.rich_text
                 },
                 "label": {
@@ -73,7 +74,7 @@ export default function buildConfigView(config: AnchorChannelConfig): ModalView 
                         "text": "Select user",
                         "emoji": true
                     },
-                    "action_id": "users_select-action",
+                    "action_id": "user_impersonate",
                     "initial_user": config.user_impersonate
                 },
                 "label": {
