@@ -6,7 +6,12 @@ declare global {
 
             // Slack creds
             BOT_TOKEN: string;
+            APP_TOKEN: string;
             SIGNING_SECRET: string;
+
+            // Slack user creds
+            XOXC: string;
+            XOXD: string;
 
             // Postgres creds
             PG_HOST: string;
