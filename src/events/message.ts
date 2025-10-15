@@ -23,6 +23,10 @@ export default async function MessageEvent(ctx: SlackEventMiddlewareArgs<"messag
     const last_anchored_message = await sql<AnchorLastAnchored[]>`SELECT * FROM last_anchored_message WHERE channel_id = ${ctx.message.channel}`;
 
     if (last_anchored_message[0]) {
+        await ctx.client.pins.remove({
+            channel: ctx.message.channel,
+            timestamp: last_anchored_message[0].ts
+        })
         await ctx.client.chat.delete({
             channel: ctx.message.channel,
             ts: last_anchored_message[0].ts
