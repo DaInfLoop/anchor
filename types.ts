@@ -6,3 +6,8 @@ export type AnchorChannelConfig = {
     rich_text: RichTextBlock,
     user_impersonate: string
 }
+
+export type AnchorLastAnchored = {
+    channel_id: string,
+    ts: string
+}
