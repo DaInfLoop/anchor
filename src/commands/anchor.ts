@@ -34,7 +34,7 @@ export default async function AnchorMainCommand(ctx: SlackCommandMiddlewareArgs 
 
     await ctx.ack();
 
-    const config = await (async function (): Promise<AnchorChannelConfig> {
+    const config = await (async function (): Promise<AnchorChannelConfig & { is_default?: boolean }> {
         const database_response = await sql<AnchorChannelConfig[]>`SELECT * FROM config WHERE channel_id = ${channel.id!}`;
 
         if (database_response[0]) {
@@ -42,6 +42,7 @@ export default async function AnchorMainCommand(ctx: SlackCommandMiddlewareArgs 
         }
 
         return {
+            is_default: true,
             channel_id: channel.id!,
             enabled: false,
             rich_text: {
@@ -61,6 +62,25 @@ export default async function AnchorMainCommand(ctx: SlackCommandMiddlewareArgs 
             user_impersonate: 'U09JQK9FR6H'
         }
     })();
+
+    if (config.is_default && (channel.num_members ?? 0) >= 100) {
+        const [ warned ] = await sql<{ warned: boolean }[]>`SELECT EXISTS ( SELECT 1 FROM warnings WHERE channel_id = ${channel.id!} AND large_channel = ${false} ) AS warned`;
+
+        if (!warned) {
+            await ctx.client.chat.postEphemeral({
+                channel: channel.id!,
+                user: ctx.body.user_id,
+                text: `:warning: *Hey <@${ctx.payload.user_id}>!* This channel has over 100 members. Anchor isn't built for channels with massive amounts of activity. If you still want to use Anchor, run \`/anchor\` again, but be warned that some things might break (and the bot might also get ratelimited often).`
+            })
+
+            await sql`INSERT INTO warnings (channel_id, large_channel)
+            VALUES (${channel.id!}, ${true})
+            ON CONFLICT DO UPDATE SET
+                large_channel = EXCLUDED.large_channel`
+
+            return;
+        }
+    }
 
     await ctx.client.views.open({
         trigger_id: ctx.payload.trigger_id,
