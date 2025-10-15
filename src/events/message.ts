@@ -13,7 +13,6 @@ const VALID_MESSAGE_SUBTYPES: SlackEventMiddlewareArgs<"message">['message']['su
 ]
 
 export default async function MessageEvent(ctx: SlackEventMiddlewareArgs<"message"> & AllMiddlewareArgs<StringIndexed>) {
-    console.log("message!", ctx.message.channel_type, ctx.message.subtype)
     if (!["channel", "group"].includes(ctx.message.channel_type)) return;
     if (!VALID_MESSAGE_SUBTYPES.includes(ctx.message.subtype)) return;
 
