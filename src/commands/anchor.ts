@@ -64,7 +64,7 @@ export default async function AnchorMainCommand(ctx: SlackCommandMiddlewareArgs 
     })();
 
     if (config.is_default && (channel.num_members ?? 0) >= 100) {
-        const [ warned ] = await sql<{ large_channel: boolean }[]>`SELECT EXISTS ( SELECT 1 FROM warnings WHERE channel_id = ${channel.id!} AND large_channel = ${false} ) as large_channel`;
+        const [ warned ] = await sql<{ large_channel: boolean }[]>`SELECT large_channel FROM warnings WHERE channel_id = ${channel.id!}`;
 
         if (!warned) return; // this should NEVER happen but ts-language-server is yelling at me
 
