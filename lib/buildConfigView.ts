@@ -4,7 +4,7 @@ import type { AnchorChannelConfig } from "../types";
 export default function buildConfigView(config: AnchorChannelConfig): ModalView {
     return {
         "type": "modal",
-        "callback_id": "config_view_submit",
+        "callback_id": "config-view-submit",
         "private_metadata": config.channel_id,
         "title": {
             "type": "plain_text",
@@ -34,6 +34,7 @@ export default function buildConfigView(config: AnchorChannelConfig): ModalView 
             },
             {
                 "type": "section",
+                "block_id": "anchor_status",
                 "text": {
                     "type": "mrkdwn",
                     "text": config.enabled ? ":neodog_happy: Anchor is enabled for this channel!" : ":neodog_sad: Anchor is disabled for this channel."
