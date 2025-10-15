@@ -25,17 +25,10 @@ export default async function AnchorMainCommand(ctx: SlackCommandMiddlewareArgs 
 
     const channelManagers = await getChannelManagers(channel.id!);
 
-    if (!channelManagers.length && !(user.is_admin || user.is_owner || user.is_primary_owner)) {
+    if (!channelManagers.includes(user.id!) && channel.creator !== user.id!) {
         return await ctx.ack({
             response_type: 'ephemeral',
-            text: `:warning: *Hey <@${ctx.payload.user_id}>!* This channel doesn't have any channel managers. If you want to manage Anchor configuration, ask a workspace admin in <#C01D7AHKMPF> to grant you channel manager.`
-        })
-    }
-
-    if (!channelManagers.includes(user.id!)) {
-        return await ctx.ack({
-            response_type: 'ephemeral',
-            text: `:warning: *Hey <@${ctx.payload.user_id}>!* Seems like you aren't a channel manager of <#${channel.id}>. If you want to manage Anchor configuration, ask a channel manager to give you channel manager.`
+            text: `:warning: *Hey <@${ctx.payload.user_id}>!* Seems like you aren't a channel manager of <#${channel.id}>. If you want to manage Anchor configuration, ask a channel manager to give you channel manager or ask someone in <#C01D7AHKMPF>.`
         })
     }
 
