@@ -18,7 +18,11 @@ async function handleRichTextSection(section: { elements: RichTextElement[] }) {
                 break;
 
             case 'link':
-                txt += `<${el.url}|${el.text}>`;
+                if (el.text) {
+                    txt += `<${el.url}|${el.text}>`;
+                } else {
+                    txt += `${el.url}`
+                }
                 break;
 
             case 'text':
