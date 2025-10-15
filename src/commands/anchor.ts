@@ -7,7 +7,7 @@ import buildConfigView from "../../lib/buildConfigView";
 export default async function AnchorMainCommand(ctx: SlackCommandMiddlewareArgs & AllMiddlewareArgs<StringIndexed>) {
     const channelInfo = await (async () => {
         try {
-            return await ctx.client.conversations.info({ channel: ctx.payload.channel_id })
+            return await ctx.client.conversations.info({ channel: ctx.payload.channel_id, include_num_members: true })
         } catch (err) {
             return { ok: false }
         }
@@ -64,9 +64,11 @@ export default async function AnchorMainCommand(ctx: SlackCommandMiddlewareArgs 
     })();
 
     if (config.is_default && (channel.num_members ?? 0) >= 100) {
-        const [ warned ] = await sql<{ warned: boolean }[]>`SELECT EXISTS ( SELECT 1 FROM warnings WHERE channel_id = ${channel.id!} AND large_channel = ${false} ) AS warned`;
+        const [ warned ] = await sql<{ large_channel: boolean }[]>`SELECT EXISTS ( SELECT 1 FROM warnings WHERE channel_id = ${channel.id!} AND large_channel = ${false} ) as large_channel`;
 
-        if (!warned) {
+        if (!warned) return; // this should NEVER happen but ts-language-server is yelling at me
+
+        if (!warned.large_channel) {
             await ctx.client.chat.postEphemeral({
                 channel: channel.id!,
                 user: ctx.body.user_id,
@@ -75,7 +77,7 @@ export default async function AnchorMainCommand(ctx: SlackCommandMiddlewareArgs 
 
             await sql`INSERT INTO warnings (channel_id, large_channel)
             VALUES (${channel.id!}, ${true})
-            ON CONFLICT DO UPDATE SET
+            ON CONFLICT (channel_id) DO UPDATE SET
                 large_channel = EXCLUDED.large_channel`
 
             return;
