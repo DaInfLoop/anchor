@@ -10,13 +10,12 @@ export default async function ConfigViewSubmit(ctx: SlackViewMiddlewareArgs<Slac
 
     const view = ctx.view;
 
-    // If the button style is "danger", this means that config.enabled = true
     const button = (view.blocks.find(block => block.block_id == "anchor_status") as SectionBlock).accessory as Button;
     const richText = view.state.values['rich_text']!['rich_text']?.rich_text_value!
 
     const config = await sql<AnchorChannelConfig[]>`INSERT INTO config (channel_id, enabled, rich_text, user_impersonate) VALUES (
         ${view.private_metadata},
-        ${!(button.style === "danger")},
+        ${(button.value === "true")},        
         ${sql.json(JSON.parse(JSON.stringify(richText)))},
         ${view.state.values['user_impersonate']!['user_impersonate']!.selected_user!}
     )
