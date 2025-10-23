@@ -16,6 +16,17 @@ export default async function MessageEvent(ctx: SlackEventMiddlewareArgs<"messag
     if (!["channel", "group"].includes(ctx.message.channel_type)) return;
     if (!VALID_MESSAGE_SUBTYPES.includes(ctx.message.subtype)) return;
 
+    const message = await ctx.client.conversations.history({
+        channel: ctx.message.channel,
+        latest: ctx.message.ts,
+        inclusive: true,
+        limit: 1
+    });
+
+    if (message.messages && message.messages[0]) {
+        if (message.messages[0].thread_ts !== message.messages[0].ts) return;
+    }
+
     const config = await sql<AnchorChannelConfig[]>`SELECT * FROM config WHERE channel_id = ${ctx.message.channel}`;
 
     if (!config[0] || !config[0].enabled) return;
