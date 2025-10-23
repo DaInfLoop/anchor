@@ -37,11 +37,11 @@ export default async function MessageEvent(ctx: SlackEventMiddlewareArgs<"messag
         await ctx.client.pins.remove({
             channel: ctx.message.channel,
             timestamp: last_anchored_message[0].ts
-        })
+        }).then(() => {}).catch(() => {})
         await ctx.client.chat.delete({
             channel: ctx.message.channel,
             ts: last_anchored_message[0].ts
-        })
+        }).then(() => {}).catch(() => {})
     }
 
     const userImpersonate = {
