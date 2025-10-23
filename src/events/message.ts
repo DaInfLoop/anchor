@@ -24,7 +24,7 @@ export default async function MessageEvent(ctx: SlackEventMiddlewareArgs<"messag
     });
 
     if (message.messages && message.messages[0]) {
-        if (message.messages[0].thread_ts !== message.messages[0].ts) return;
+        if (message.messages[0].thread_ts && message.messages[0].thread_ts !== message.messages[0].ts) return;
     }
 
     const config = await sql<AnchorChannelConfig[]>`SELECT * FROM config WHERE channel_id = ${ctx.message.channel}`;
